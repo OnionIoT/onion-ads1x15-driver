@@ -32,7 +32,7 @@ ifeq ($(CXX),mips-openwrt-linux-uclibc-gcc)
 endif
 
 # define specific binaries to create
-APP0 := ads1x15-driver
+APP0 := ads1x15-chip
 TARGET := $(BINDIR)/$(APP0)
 
 # libraries
