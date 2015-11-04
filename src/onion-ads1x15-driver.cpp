@@ -108,7 +108,7 @@ int ads1X15::ReadAdc (int channel, int &value)
 	int 	status;
 	adsRegConfig_t 	configReg;
 	int 	result, channelVal;
-	int 	configRegTmp;	//dbg
+
 
 	if (channel >= ADS1X15_NUM_CHANNELS) {
 		return EXIT_FAILURE;
@@ -122,17 +122,6 @@ int ads1X15::ReadAdc (int channel, int &value)
 	if (status != EXIT_SUCCESS) {
 		// ERROR!
 	}
-
-	// set up the config register for single-ended read
-	/*_SetBit(configRegTmp, ADS1X15_REG_CONFIG_COMP_QUEUE_OFFSET, 	ADS1X15_COMP_QUEUE_DISABLE_COMP);	// disable comparator
-	_SetBit(configRegTmp, ADS1X15_REG_CONFIG_COMP_LATCH_OFFSET, 	ADS1X15_COMP_LATCH_NO_LATCH);		// non-latching
-	_SetBit(configRegTmp, ADS1X15_REG_CONFIG_COMP_POLARITY_OFFSET, 	ADS1X15_COMP_POLARITY_ACTIVE_LOW);	// ALRT pin is active-low
-	_SetBit(configRegTmp, ADS1X15_REG_CONFIG_COMP_MODE_OFFSET,		ADS1X15_COMP_MODE_TRADITIONAL);		// set comparator to traditional
-	_SetBit(configRegTmp, ADS1X15_REG_CONFIG_DATARATE_OFFSET,		ADS1X15_DATARATE_1600SPS);			// 1600 samples per second
-	_SetBit(configRegTmp, ADS1X15_REG_CONFIG_MODE_OFFSET,			ADS1X15_MODE_SINGLE_SHOT);			// single-shot mode
-
-	// set PGA/voltage gain
-	_SetBit(configRegTmp, ADS1X15_REG_CONFIG_PGA_OFFSET,			gainValue);		*/
 
 	// set up the config register for single-ended read
 	configReg.f.comp_queue 			= ADS1X15_COMP_QUEUE_DISABLE_COMP;		// disable comparator
@@ -169,11 +158,9 @@ int ads1X15::ReadAdc (int channel, int &value)
 	}
 
 	configReg.f.input_mux 			= channelVal;
-	_SetBit(configRegTmp, ADS1X15_REG_CONFIG_INPUT_MUX_OFFSET,		channelVal);		
 
 	// set 'start single-conversion' bit
 	configReg.f.status_start 		= 1;
-	_SetBit(configRegTmp, ADS1X15_REG_CONFIG_OP_STATUS_START_OFFSET,	1);
 
 
 	// write to the config register
