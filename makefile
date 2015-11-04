@@ -20,38 +20,39 @@ OBJECTS := $(patsubst $(SRCDIR)/%,$(BUILDDIR)/%,$(SOURCES:.$(SRCEXT)=.o))
 CXXFLAGS := -g # -Wall
 
 INC := $(shell find $(INCDIR) -maxdepth 1 -type d -exec echo -I {}  \;)
-LIB := -lonioni2c
+LIB += -lonioni2c
 
 ifeq ($(UNAME_S),Darwin)
 	# only add this when compiling on OS X
 	LIB := -L$(LIBDIR) $(LIB)
 	INC += -I $(LIBDIR)
 endif
-ifeq ($(CXX),mips-openwrt-linux-uclibc-gcc)
-	CUSTFLAGS := -fPIC
-endif
 
 # define specific binaries to create
 APP0 := ads1x15-chip
 TARGET := $(BINDIR)/$(APP0)
 
-# libraries
+all: bla $(TARGET)
+
 $(TARGET): $(OBJECTS)
 	@mkdir -p $(BINDIR)
 	@echo " Linking..."
-	@echo " $(CXX) $^ -o $(TARGET) $(LIB)"; $(CXX) $^ -o $(TARGET) $(LIB)
+	@echo " $(CXX) $^ $(CXXFLAGS) $(LDFLAGS) -o $(TARGET) $(LIB)"; $(CXX) $^ $(CXXFLAGS) $(LDFLAGS) -o $(TARGET) $(LIB)
 
 # generic: build any object file required
 $(BUILDDIR)/%.o: $(SRCDIR)/%.$(SRCEXT)
 	@mkdir -p $(dir $@)
 	@echo "building $@"
-	@echo " $(CXX) $(CXXFLAGS) $(CUSTFLAGS) $(INC) -c -o $@ $<"; $(CXX) $(CXXFLAGS) $(CUSTFLAGS) $(INC) -c -o $@ $<
+	@echo " $(CXX) $(CXXFLAGS) $(INC) -c -o $@ $<"; $(CXX) $(CXXFLAGS) $(INC) -c -o $@ $<
 
 clean:
 	@echo " Cleaning..."; 
 	@echo " $(RM) -r $(BUILDDIR) $(BINDIR)"; $(RM) -r $(BUILDDIR) $(BINDIR)
 
 bla:
+	@echo "CXX: $(CXX)"
+	@echo "CXXFLAGS: $(CXXFLAGS)"
+	@echo "LDFLAGS: $(LDFLAGS)"
 	@echo "LIB: $(LIB)"
 	@echo "INC: $(INC)"
 
