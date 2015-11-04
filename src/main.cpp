@@ -9,6 +9,7 @@ int main(int argc, char* argv[])
 
 	// setup the verbosity
 	adsObj->SetVerbosity(1);
+	adsObj->SetDebugMode(1);
 	
 	// run the ADC conversion
 	status 	= adsObj->ReadAdc(0, value);

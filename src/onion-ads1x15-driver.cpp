@@ -38,10 +38,53 @@ void ads1X15::Reset (void)
 
 void ads1X15::SetVerbosity (int input)
 {
-	verbosityLevel	= input;
+	Module::SetVerbosity(input);
 
 	// also set the i2c lib verbosity
 	i2c_setVerbosity(input);
+}
+
+
+// private class function
+int ads1X15::_ReadReg (int addr, int &value, int numBytes)
+{
+	int status;
+
+	if (debugLevel == 0) {
+		status = i2c_read	(	
+							ADS1X15_I2C_DEVICE_NUM, 
+							devAddr, 
+							addr, 
+							&value, 
+							numBytes
+						);
+	}
+	else {
+		status 	= EXIT_SUCCESS;
+		value 	= 0x00;
+	}
+
+	return status;
+}
+
+int ads1X15::_WriteReg (int addr, int value, int numBytes)
+{
+	int status;
+
+	if (debugLevel == 0) {
+		status = i2c_writeBytes	(	
+							ADS1X15_I2C_DEVICE_NUM, 
+							devAddr, 
+							addr, 
+							value, 
+							numBytes
+						);
+	}
+	else {
+		status 	= EXIT_SUCCESS;
+	}
+
+	return status;
 }
 
 
@@ -64,11 +107,8 @@ int ads1X15::ReadAdc (int channel, int &value)
 	}
 
 	// read the current reg value
-	status = i2c_read	(	
-							ADS1X15_I2C_DEVICE_NUM, 
-							devAddr, 
-							ADS1X15_REG_ADDR_CONFIG, 
-							&configReg, 
+	status = _ReadReg	(	ADS1X15_REG_ADDR_CONFIG, 
+							configReg, 
 							2
 						);
 	if (status != EXIT_SUCCESS) {
@@ -81,7 +121,7 @@ int ads1X15::ReadAdc (int channel, int &value)
 	_SetBit(configReg, ADS1X15_REG_CONFIG_COMP_POLARITY_OFFSET, ADS1X15_COMP_POLARITY_ACTIVE_LOW);	// ALRT pin is active-low
 	_SetBit(configReg, ADS1X15_REG_CONFIG_COMP_MODE_OFFSET,		ADS1X15_COMP_MODE_TRADITIONAL);		// set comparator to traditional
 	_SetBit(configReg, ADS1X15_REG_CONFIG_DATARATE_OFFSET,		ADS1X15_DATARATE_1600SPS);			// 1600 samples per second
-	_SetBit(configReg, ADS1X15_REG_CONFIG_MODE_OFFSET,			ADS1X15_MODE_SINGLE_SHOT);
+	_SetBit(configReg, ADS1X15_REG_CONFIG_MODE_OFFSET,			ADS1X15_MODE_SINGLE_SHOT);			// single-shot mode
 
 	// set PGA/voltage gain
 	_SetBit(configReg, ADS1X15_REG_CONFIG_PGA_OFFSET,			gainValue);		
@@ -94,10 +134,7 @@ int ads1X15::ReadAdc (int channel, int &value)
 
 
 	// write to the config register
-	status = i2c_writeBytes	( 	
-							ADS1X15_I2C_DEVICE_NUM,
-							devAddr,
-							ADS1X15_REG_ADDR_CONFIG,
+	status = _WriteReg	( 	ADS1X15_REG_ADDR_CONFIG,
 							configReg,
 							2
 						);
@@ -109,11 +146,8 @@ int ads1X15::ReadAdc (int channel, int &value)
 	usleep(conversionDelayUs);
 
 	// read the conversion results
-	status = i2c_read	(	
-							ADS1X15_I2C_DEVICE_NUM, 
-							devAddr, 
-							ADS1X15_REG_ADDR_CONFIG, 
-							&result, 
+	status = _ReadReg	(	ADS1X15_REG_ADDR_CONFIG, 
+							result, 
 							2
 						);
 	if (status != EXIT_SUCCESS) {

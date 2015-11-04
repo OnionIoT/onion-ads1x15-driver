@@ -1,16 +1,8 @@
 #ifndef _MODULE_H_
 #define _MODULE_H_
 
-#include <sys/types.h>
-#include <sys/mman.h>
-#include <sys/stat.h>
 #include <stdlib.h>
 #include <stdio.h>
-#include <fcntl.h>
-#include <unistd.h>
-
-
-
 
 
 class Module {

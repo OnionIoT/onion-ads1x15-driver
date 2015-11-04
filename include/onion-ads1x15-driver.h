@@ -146,6 +146,10 @@ public:
 
 
 private:
+	// private functions
+	int 	_ReadReg 		(int addr, int &value, int numBytes);
+	int 	_WriteReg 		(int addr, int value, int numBytes);
+
 	// private members
 	int 	devAddr;
 	int 	conversionDelay;
