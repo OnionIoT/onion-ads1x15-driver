@@ -3,6 +3,7 @@
 
 #include <stdlib.h>
 #include <stdio.h>
+#include <stdarg.h>
 
 
 class Module {
@@ -12,6 +13,8 @@ public:
 
 	virtual void 	SetVerbosity	(int input);
 	void 			SetVerbosity	(bool input);
+
+	void 			_Print 			(const char* msg, ...);
 
 	void			SetDebugMode	(int input);
 	void			SetDebugMode	(bool input);

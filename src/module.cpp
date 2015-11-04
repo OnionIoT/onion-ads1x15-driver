@@ -36,6 +36,16 @@ void Module::SetDebugMode (bool input)
 	debugLevel		= (input ? 1 : 0);
 }
 
+void Module::_Print (const char* msg, ...)
+{
+	va_list 	argptr;	
+
+	if (verbosityLevel > 0) {
+		va_start(argptr, msg);
+		vprintf(msg, argptr);
+		va_end(argptr);
+	}
+}
 
 //// Register access
 // change the value of a single bit

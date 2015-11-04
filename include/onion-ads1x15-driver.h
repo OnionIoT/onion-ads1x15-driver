@@ -5,6 +5,8 @@
 #include <unistd.h>
 		
 
+#define ADS1X15_PRINT_BANNER			"ADS1X15::"
+
 #define ADS1X15_I2C_DEVICE_NUM			(0)
 #define ADS1X15_I2C_DEVICE_ADDR			(0x48)
 
@@ -30,14 +32,28 @@
 #define ADS1X15_REG_CONFIG_COMP_LATCH_OFFSET		(2)
 #define ADS1X15_REG_CONFIG_COMP_QUEUE_OFFSET		(0)
 
-#define ADS1015_REG_CONFIG_PGA_6_144V				(0)
-#define ADS1015_REG_CONFIG_PGA_4_096V				(1)
-#define ADS1015_REG_CONFIG_PGA_2_048V				(2)
-#define ADS1015_REG_CONFIG_PGA_1_024V				(3)
-#define ADS1015_REG_CONFIG_PGA_0_512V				(4)
-#define ADS1015_REG_CONFIG_PGA_0_256V				(5)
+#define ADS1X15_REG_CONFIG_PGA_6_144V				(0)
+#define ADS1X15_REG_CONFIG_PGA_4_096V				(1)
+#define ADS1X15_REG_CONFIG_PGA_2_048V				(2)
+#define ADS1X15_REG_CONFIG_PGA_1_024V				(3)
+#define ADS1X15_REG_CONFIG_PGA_0_512V				(4)
+#define ADS1X15_REG_CONFIG_PGA_0_256V				(5)
 
 
+typedef union adsRegConfig_u {
+	int val;
+	struct {
+		unsigned char comp_queue 		: 2;
+		unsigned char comp_latch 		: 1;
+		unsigned char comp_polarity 	: 1;
+		unsigned char comp_mode 	 	: 1;
+		unsigned char data_rate		 	: 3;
+		unsigned char mode 				: 1;
+		unsigned char pga  				: 3;
+		unsigned char input_mux			: 3;
+		unsigned char status_start		: 1;
+	} f;
+} adsRegConfig_t;
 
 typedef enum
 {
@@ -69,12 +85,12 @@ typedef enum
 
 typedef enum
 {
-	ADS1X15_GAIN_TWOTHIRDS			= ADS1015_REG_CONFIG_PGA_6_144V,
-	ADS1X15_GAIN_ONE				= ADS1015_REG_CONFIG_PGA_4_096V,
-	ADS1X15_GAIN_TWO  				= ADS1015_REG_CONFIG_PGA_2_048V,
-	ADS1X15_GAIN_FOUR 				= ADS1015_REG_CONFIG_PGA_1_024V,
-	ADS1X15_GAIN_EIGHT				= ADS1015_REG_CONFIG_PGA_0_512V,
-	ADS1X15_GAIN_SIXTEEN			= ADS1015_REG_CONFIG_PGA_0_256V
+	ADS1X15_GAIN_TWOTHIRDS			= ADS1X15_REG_CONFIG_PGA_6_144V,
+	ADS1X15_GAIN_ONE				= ADS1X15_REG_CONFIG_PGA_4_096V,
+	ADS1X15_GAIN_TWO  				= ADS1X15_REG_CONFIG_PGA_2_048V,
+	ADS1X15_GAIN_FOUR 				= ADS1X15_REG_CONFIG_PGA_1_024V,
+	ADS1X15_GAIN_EIGHT				= ADS1X15_REG_CONFIG_PGA_0_512V,
+	ADS1X15_GAIN_SIXTEEN			= ADS1X15_REG_CONFIG_PGA_0_256V
 } adsGain_t;
 
 typedef enum
