@@ -1,29 +1,111 @@
 #include <main.h>
 
+void usage(const char* progName) {
+	printf("Usage:\n");
+	printf("\t%s [-qvd] <channel> [gain]\n", progName);
+	printf("\n");
+	printf("<channel>	Analog input channel, can be 0 to 3\n");
+	printf("[gain]		Set gain parameter (optional)\n");	// expand on this
+	printf("\n");
+	printf("Options\n");
+	printf("\t-q	Quiet: no output\n");
+	printf("\t-v	Verbose: lots of output\n");
+	printf("\t-d	Debug: do not carry out any I2C transactions\n");
+	printf("\n");
+}
+
+/*
+int parseArguments(const char* progName, int argc, char* argv[], gpioSetup *setup)
+{
+	// check for the correct number of arguments
+	if ( argc < 2 ) 
+	{
+		usage(progName);
+		return EXIT_FAILURE;
+	}
+
+	// get the channel number
+
+
+	return EXIT_SUCCESS;
+}*/
+
 int main(int argc, char* argv[])
 {
-	int status;
-	int value;
+	int 		status;
+	int 		value;
 
+	const char 	*progname;
+	int 		verbose, debug;
+	int 		ch;
+
+	int 		channel;
+	int 		gain;
 	ads1X15*	adsObj	= new ads1X15;
 
-	// setup the verbosity
-	adsObj->SetVerbosity(1);
-	adsObj->SetDebugMode(1);
+	// save the program name
+	progname 	= argv[0];	
 
-	printf("> byte order: %d\n", BYTE_ORDER);
-#if BYTE_ORDER == BIG_ENDIAN
-	// Big Endian - MSB in smallest addr
-	printf("> Running BIG endian: %d!\n", BYTE_ORDER);
-#else
-	// Little Endian - LSB in smallest addr
-	printf("> Running LITTLE endian: %d!\n", BYTE_ORDER);
-#endif	// BYTE_ORDER
+	// set the defaults
+	verbose 	= ADS1X15_MAIN_DEFAULT_VERBOSITY;
+	debug 		= ADS1X15_MAIN_DEFAULT_DEBUG;
+
+
+	//// parse the option arguments
+	while ((ch = getopt(argc, argv, "xvqdh")) != -1) {
+		switch (ch) {
+		case 'x':
+			// verbose output, including i2c lib
+			verbose = ADS1X15_MAIN_VERBOSITY_EXTRA_VERBOSE;
+			break;
+		case 'v':
+			// verbose output
+			verbose = ADS1X15_MAIN_VERBOSITY_VERBOSE;
+			break;
+		case 'q':
+			// quiet output
+			verbose = ADS1X15_MAIN_VERBOSITY_QUIET;
+			break;
+		case 'd':
+			// debug mode
+			debug 	= 1;
+			break;
+		default:
+			usage(progname);
+			return 0;
+		}
+	}
+
+	// advance past the option arguments
+	argc 	-= optind;
+	argv	+= optind;
+
 	
-	// run the ADC conversion
-	status 	= adsObj->ReadAdc(0, value);
+	//// parse the arguments
+	// channel argument
+	if (argc > 0) {
+		channel 	= atoi(argv[0]);
+	}
+	else {
+		usage(progname);
+		return EXIT_FAILURE;
+	}
 
-	printf("status is %d, value is %d\n", status, value);
+	// gain argument
+	if (argc > 1) {
+		gain 		= atoi(argv[1]);
+	}
+
+
+	//// actual program
+	// setup the verbosity
+	adsObj->SetVerbosity(verbose);
+	adsObj->SetDebugMode(debug);
+
+	// run the ADC conversion
+	status 	= adsObj->ReadAdc(channel, value);
+
+	printf("> ADS channel%d, value is %d\n", channel, value);
 
 
 	return 0;
