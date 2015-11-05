@@ -9,7 +9,8 @@ void usage(const char* progName) {
 	printf("\n");
 	printf("Options\n");
 	printf("\t-q	Quiet: no output\n");
-	printf("\t-v	Verbose: lots of output\n");
+	printf("\t-v	Verbose: debug output\n");
+	printf("\t-x	Extra Verbose: all debug output\n");
 	printf("\t-d	Debug: do not carry out any I2C transactions\n");
 	printf("\n");
 }
@@ -39,8 +40,8 @@ int main(int argc, char* argv[])
 	int 		verbose, debug;
 	int 		ch;
 
-	int 		channel;
-	int 		gain;
+	int 		channel	= -1;
+	int 		gain 	= -1;
 	ads1X15*	adsObj	= new ads1X15;
 
 	// save the program name
@@ -85,6 +86,12 @@ int main(int argc, char* argv[])
 	// channel argument
 	if (argc > 0) {
 		channel 	= atoi(argv[0]);
+
+		if (channel < 0 || channel > ADS1X15_NUM_CHANNELS) {
+			usage(progname);
+			printf ("ERROR: invalid number of channels!\n");
+			return EXIT_FAILURE;
+		}
 	}
 	else {
 		usage(progname);
@@ -94,6 +101,12 @@ int main(int argc, char* argv[])
 	// gain argument
 	if (argc > 1) {
 		gain 		= atoi(argv[1]);
+
+		if (gain < 0 || gain > ADS1X15_NUM_GAIN) {
+			usage(progname);
+			printf ("ERROR: invalid gain setting!\n");
+			return EXIT_FAILURE;
+		}
 	}
 
 
@@ -101,6 +114,16 @@ int main(int argc, char* argv[])
 	// setup the verbosity
 	adsObj->SetVerbosity(verbose);
 	adsObj->SetDebugMode(debug);
+
+	// set the gain
+	if (gain != -1) {
+		printf("> Setting gain to setting %d\n", gain);
+		status 	= adsObj->SetGain(gain);
+		if (status != EXIT_SUCCESS) {
+			printf("ERROR setting gain!\n");
+			return EXIT_FAILURE;
+		}
+	}
 
 	// run the ADC conversion
 	status 	= adsObj->ReadAdc(channel, value);
