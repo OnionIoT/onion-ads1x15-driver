@@ -43,31 +43,31 @@
 typedef union adsRegConfig_u {
 	int val;
 	struct {
-#if __BYTE_ORDER == __BIG_ENDIAN
+#if BYTE_ORDER == BIG_ENDIAN
 		// Big Endian - MSB in smallest addr
-		unsigned char 	comp_queue 			: 2;	// config[1:0]
-		unsigned char 	comp_latch 			: 1;	// config[2]
-		unsigned char 	comp_polarity 		: 1;	// config[3]
-		unsigned char 	comp_mode 	 		: 1;	// config[4]
-		unsigned char 	data_rate		 	: 3;	// config[7:5]
-		unsigned char 	mode 				: 1;	// config[8]
-		unsigned char 	pga  				: 3;	// config[11:9]
-		unsigned char 	input_mux			: 3;	// config[14:12]
-		unsigned char 	status_start		: 1;	// config[15]
 		int 			padding 			: 16;
+		unsigned char 	status_start		: 1;	// config[15]
+		unsigned char 	input_mux			: 3;	// config[14:12]
+		unsigned char 	pga  				: 3;	// config[11:9]
+		unsigned char 	mode 				: 1;	// config[8]
+		unsigned char 	data_rate		 	: 3;	// config[7:5]
+		unsigned char 	comp_mode 	 		: 1;	// config[4]
+		unsigned char 	comp_polarity 		: 1;	// config[3]
+		unsigned char 	comp_latch 			: 1;	// config[2]
+		unsigned char 	comp_queue 			: 2;	// config[1:0]
 #else
 		// Little Endian - LSB in smallest addr
-		int 			padding 			: 16;
-		unsigned char 	status_start		: 1;	// config[15]
-		unsigned char 	input_mux			: 3;	// config[14:12]
-		unsigned char 	pga  				: 3;	// config[11:9]
-		unsigned char 	mode 				: 1;	// config[8]
-		unsigned char 	data_rate		 	: 3;	// config[7:5]
-		unsigned char 	comp_mode 	 		: 1;	// config[4]
-		unsigned char 	comp_polarity 		: 1;	// config[3]
-		unsigned char 	comp_latch 			: 1;	// config[2]
 		unsigned char 	comp_queue 			: 2;	// config[1:0]
-#endif	// __BYTE_ORDER
+		unsigned char 	comp_latch 			: 1;	// config[2]
+		unsigned char 	comp_polarity 		: 1;	// config[3]
+		unsigned char 	comp_mode 	 		: 1;	// config[4]
+		unsigned char 	data_rate		 	: 3;	// config[7:5]
+		unsigned char 	mode 				: 1;	// config[8]
+		unsigned char 	pga  				: 3;	// config[11:9]
+		unsigned char 	input_mux			: 3;	// config[14:12]
+		unsigned char 	status_start		: 1;	// config[15]
+		int 			padding 			: 16;
+#endif	// BYTE_ORDER
 	} f;
 } adsRegConfig_t;
 

@@ -11,13 +11,14 @@ int main(int argc, char* argv[])
 	adsObj->SetVerbosity(1);
 	adsObj->SetDebugMode(1);
 
-#if __BYTE_ORDER == __BIG_ENDIAN
+	printf("> byte order: %d\n", BYTE_ORDER);
+#if BYTE_ORDER == BIG_ENDIAN
 	// Big Endian - MSB in smallest addr
-	printf("> Running BIG endian!\n");
+	printf("> Running BIG endian: %d!\n", BYTE_ORDER);
 #else
 	// Little Endian - LSB in smallest addr
-	printf("> Running LITTLE endian!\n");
-#endif	// __BYTE_ORDER
+	printf("> Running LITTLE endian: %d!\n", BYTE_ORDER);
+#endif	// BYTE_ORDER
 	
 	// run the ADC conversion
 	status 	= adsObj->ReadAdc(0, value);
