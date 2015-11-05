@@ -42,7 +42,7 @@ void ads1X15::SetVerbosity (int input)
 	Module::SetVerbosity(input);
 
 	// also set the i2c lib verbosity
-	i2c_setVerbosity(input);
+	i2c_setVerbosity(input > 1 ? 1 : 0);
 }
 
 
@@ -176,7 +176,7 @@ int ads1X15::ReadAdc (int channel, int &value)
 	usleep(conversionDelayUs);
 
 	// read the conversion results
-	status = _ReadReg	(	ADS1X15_REG_ADDR_CONFIG, 
+	status = _ReadReg	(	ADS1X15_REG_ADDR_CONVERT, 
 							result, 
 							2
 						);
