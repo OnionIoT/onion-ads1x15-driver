@@ -34,6 +34,7 @@
 #define ADS1X15_REG_CONFIG_PGA_0_256V				(5)
 
 
+// union to represent the CONFIG register
 typedef union adsRegConfig_u {
 	int val;
 	struct {
@@ -65,6 +66,8 @@ typedef union adsRegConfig_u {
 	} f;
 } adsRegConfig_t;
 
+
+// enums to represent parameters
 typedef enum
 {
 	ADS1X15_TYPE_ADS1015	= 0,
@@ -81,6 +84,8 @@ typedef enum
 	ADS1X15_NUM_CHANNELS
 } adsChannels_t;
 
+
+// enums to represent register settings
 typedef enum
 {
 	ADS1X15_INPUT_MUX_COMP_A0_A1 	= 0,
@@ -148,6 +153,7 @@ typedef enum
 } adsCompQueue_t;
 
 
+
 class ads1X15 : public Module {
 public:
 	ads1X15(int addr = ADS1X15_I2C_DEVICE_ADDR, int type = ADS1X15_TYPE_ADS1015);
@@ -176,10 +182,11 @@ public:
 
 private:
 	// private functions
-	int 	_ReadReg 		(int addr, int &value, int numBytes);
-	int 	_WriteReg 		(int addr, int value, int numBytes);
+	int 	_ReadReg 				(int addr, int &value, int numBytes);
+	int 	_WriteReg 				(int addr, int value, int numBytes);
 
-	int 	_ReadConverson	(int &value);
+	int 	_ChannelToInputMux		(int channel, int &fieldValue);
+	int 	_ReadConverson			(int &value);
 
 	// private members
 	int 	devAddr;

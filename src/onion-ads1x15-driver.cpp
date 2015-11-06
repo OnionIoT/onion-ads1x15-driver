@@ -94,6 +94,37 @@ int ads1X15::_WriteReg (int addr, int value, int numBytes)
 	return status;
 }
 
+int ads1X15::_ChannelToInputMux (int channel, int &inputMuxSel)
+{
+	int status 	= EXIT_SUCCESS;
+
+	switch(channel) {
+		case ADS1X15_CHANNEL_A0:
+			inputMuxSel 	= ADS1X15_INPUT_MUX_SINGLE_A0;
+			break;
+
+		case ADS1X15_CHANNEL_A1:
+			inputMuxSel 	= ADS1X15_INPUT_MUX_SINGLE_A1;
+			break;
+
+		case ADS1X15_CHANNEL_A2:
+			inputMuxSel 	= ADS1X15_INPUT_MUX_SINGLE_A2;
+			break;
+
+		case ADS1X15_CHANNEL_A3:
+			inputMuxSel 	= ADS1X15_INPUT_MUX_SINGLE_A3;
+			break;
+
+		default:
+			inputMuxSel 	= ADS1X15_INPUT_MUX_SINGLE_A0;
+			status 			= EXIT_FAILURE;
+			break;
+	}
+
+	return status;
+}
+
+// read the conversion register and return the value
 int ads1X15::_ReadConverson (int &value)
 {
 	int 	status;
@@ -105,7 +136,7 @@ int ads1X15::_ReadConverson (int &value)
 							2
 						);
 	if (status != EXIT_SUCCESS) {
-		_Print(ADS1X15_SEVERITY_FATAL, "ERROR: Reading Conversion Register failed!\n");
+		_Print(ADS1X15_SEVERITY_FATAL, " ERROR: Reading Conversion Register failed!\n");
 		return status;
 	}
 
@@ -148,7 +179,7 @@ int ads1X15::ReadAdc (int channel, int &value)
 							2
 						);
 	if (status != EXIT_SUCCESS) {
-		_Print(ADS1X15_SEVERITY_FATAL, "ERROR: Reading Configuration Register failed!\n");
+		_Print(ADS1X15_SEVERITY_FATAL, " ERROR: Reading Configuration Register failed!\n");
 		return status;
 	}
 
@@ -164,28 +195,10 @@ int ads1X15::ReadAdc (int channel, int &value)
 	configReg.f.pga 	 			= gainValue;
 
 	// set the channel
-	switch(channel) {
-		case ADS1X15_CHANNEL_A0:
-			channelVal 	= ADS1X15_INPUT_MUX_SINGLE_A0;
-			break;
-
-		case ADS1X15_CHANNEL_A1:
-			channelVal 	= ADS1X15_INPUT_MUX_SINGLE_A1;
-			break;
-
-		case ADS1X15_CHANNEL_A2:
-			channelVal 	= ADS1X15_INPUT_MUX_SINGLE_A2;
-			break;
-
-		case ADS1X15_CHANNEL_A3:
-			channelVal 	= ADS1X15_INPUT_MUX_SINGLE_A3;
-			break;
-
-		default:
-			channelVal 	= ADS1X15_INPUT_MUX_SINGLE_A0;
-			break;
+	status = _ChannelToInputMux(channel, channelVal);
+	if (status != EXIT_SUCCESS) {
+		_Print(ADS1X15_SEVERITY_FATAL, " INFO: invalid channel selected, defaulting to Channel0\n");
 	}
-
 	configReg.f.input_mux 			= channelVal;
 
 	// set 'start single-conversion' bit
@@ -198,7 +211,7 @@ int ads1X15::ReadAdc (int channel, int &value)
 							2
 						);
 	if (status != EXIT_SUCCESS) {
-		_Print(ADS1X15_SEVERITY_FATAL, "ERROR: Writing to Configuration Register failed!\n");
+		_Print(ADS1X15_SEVERITY_FATAL, " ERROR: Writing to Configuration Register failed!\n");
 		return status;
 	}
 
