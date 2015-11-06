@@ -64,7 +64,7 @@ int ads1X15::_ReadReg (int addr, int &value, int numBytes)
 	}
 	else {
 		status 	= EXIT_SUCCESS;
-		value 	= 0x00;
+		value 	= 0x90e1;
 	}
 
 	_Print("\tRead value 0x%04x\n", value);
@@ -107,7 +107,7 @@ int ads1X15::ReadAdc (int channel, int &value)
 {
 	int 	status;
 	adsRegConfig_t 	configReg;
-	int 	result, channelVal;
+	int 	result, resultFlip, channelVal;
 
 
 	if (channel >= ADS1X15_NUM_CHANNELS) {
@@ -184,11 +184,14 @@ int ads1X15::ReadAdc (int channel, int &value)
 		// ERROR!
 	}
 
-	// shift the result
-	result 	= result >> conversionBitShift;
+	// the bytes in the result are flipped
+	resultFlip 	= 0;
+	resultFlip 	= ( ((result & 0xff) << 8) | ((result >> 8) & 0xff) );
+	_Print("dbg:: result = 0x%04x, flipped = 0x%04x\n", result, resultFlip);
 
-	// return the result
-	value 	= result;
+	// shift the flipped result
+	value 	= resultFlip >> conversionBitShift;
+	_Print("dbg:: shifted = 0x%04x, value = %d\n", value, value);
 
 
 	return status;
