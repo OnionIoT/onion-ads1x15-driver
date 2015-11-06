@@ -163,7 +163,9 @@ public:
 	int 	SetComparatorQueue 		(int queueMode);*/
 
 	int 	SetGain 				(int gain);
+	
 	int 	ReadAdc					(int channel, int &value);
+	int 	ReadLastConversion		(int &value);
 
 
 
@@ -171,6 +173,8 @@ private:
 	// private functions
 	int 	_ReadReg 		(int addr, int &value, int numBytes);
 	int 	_WriteReg 		(int addr, int value, int numBytes);
+
+	int 	_ReadConverson	(int &value);
 
 	// private members
 	int 	devAddr;

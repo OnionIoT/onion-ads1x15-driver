@@ -94,6 +94,33 @@ int ads1X15::_WriteReg (int addr, int value, int numBytes)
 	return status;
 }
 
+int ads1X15::_ReadConverson (int &value)
+{
+	int 	status;
+	int 	result, resultFlip;
+
+	// read the conversion results
+	status = _ReadReg	(	ADS1X15_REG_ADDR_CONVERT, 
+							result, 
+							2
+						);
+	if (status != EXIT_SUCCESS) {
+		// ERROR!
+	}
+
+	// the bytes in the result are flipped
+	resultFlip 	= 0;
+	resultFlip 	= ( ((result & 0xff) << 8) | ((result >> 8) & 0xff) );
+	_Print("dbg:: result = 0x%04x, flipped = 0x%04x\n", result, resultFlip);
+
+	// shift the flipped result
+	value 	= resultFlip >> conversionBitShift;
+	_Print("dbg:: shifted = 0x%04x, value = %d\n", value, value);
+
+
+	return status;
+}
+
 
 // class functions
 int ads1X15::SetGain (int gain)
@@ -175,28 +202,29 @@ int ads1X15::ReadAdc (int channel, int &value)
 	// wait for the conversion to complete
 	usleep(conversionDelayUs);
 
+
 	// read the conversion results
-	status = _ReadReg	(	ADS1X15_REG_ADDR_CONVERT, 
-							result, 
-							2
-						);
+	status = _ReadConverson(value);
 	if (status != EXIT_SUCCESS) {
 		// ERROR!
 	}
-
-	// the bytes in the result are flipped
-	resultFlip 	= 0;
-	resultFlip 	= ( ((result & 0xff) << 8) | ((result >> 8) & 0xff) );
-	_Print("dbg:: result = 0x%04x, flipped = 0x%04x\n", result, resultFlip);
-
-	// shift the flipped result
-	value 	= resultFlip >> conversionBitShift;
-	_Print("dbg:: shifted = 0x%04x, value = %d\n", value, value);
 
 
 	return status;
 }
 
+int ads1X15::ReadLastConversion (int &value)
+{
+	int status;
 
+	// read the conversion results
+	status = _ReadConverson(value);
+	if (status != EXIT_SUCCESS) {
+		// ERROR!
+	}
+
+
+	return status;
+}
 
 
