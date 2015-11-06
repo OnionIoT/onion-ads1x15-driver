@@ -36,11 +36,11 @@ void Module::SetDebugMode (bool input)
 	debugLevel		= (input ? 1 : 0);
 }
 
-void Module::_Print (const char* msg, ...)
+void Module::_Print (int severity, const char* msg, ...)
 {
 	va_list 	argptr;	
 
-	if (verbosityLevel > 0) {
+	if (verbosityLevel >= severity) {
 		va_start(argptr, msg);
 		vprintf(msg, argptr);
 		va_end(argptr);

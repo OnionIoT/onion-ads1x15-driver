@@ -51,7 +51,7 @@ int ads1X15::_ReadReg (int addr, int &value, int numBytes)
 {
 	int status;
 
-	_Print("%s Reading reg addr 0x%02x...", ADS1X15_PRINT_BANNER, addr);
+	_Print(ADS1X15_SEVERITY_DEBUG, "%s Reading reg addr 0x%02x...", ADS1X15_PRINT_BANNER, addr);
 
 	if (debugLevel == 0) {
 		status = i2c_read	(	
@@ -63,11 +63,11 @@ int ads1X15::_ReadReg (int addr, int &value, int numBytes)
 						);
 	}
 	else {
-		status 	= EXIT_SUCCESS;
+		status 	= EXIT_SUCCESS;;
 		value 	= 0x90e1;
 	}
 
-	_Print("\tRead value 0x%04x\n", value);
+	_Print(ADS1X15_SEVERITY_DEBUG, "\tRead value 0x%04x\n", value);
 
 	return status;
 }
@@ -76,7 +76,7 @@ int ads1X15::_WriteReg (int addr, int value, int numBytes)
 {
 	int status;
 
-	_Print("%s Writing Reg addr 0x%02x with 0x%04x\n", ADS1X15_PRINT_BANNER, addr, value);
+	_Print(ADS1X15_SEVERITY_DEBUG, "%s Writing Reg addr 0x%02x with 0x%04x\n", ADS1X15_PRINT_BANNER, addr, value);
 
 	if (debugLevel == 0) {
 		status = i2c_writeBytes	(	
@@ -105,17 +105,18 @@ int ads1X15::_ReadConverson (int &value)
 							2
 						);
 	if (status != EXIT_SUCCESS) {
-		// ERROR!
+		_Print(ADS1X15_SEVERITY_FATAL, "ERROR: Reading Conversion Register failed!\n");
+		return status;
 	}
 
 	// the bytes in the result are flipped
 	resultFlip 	= 0;
 	resultFlip 	= ( ((result & 0xff) << 8) | ((result >> 8) & 0xff) );
-	_Print("dbg:: result = 0x%04x, flipped = 0x%04x\n", result, resultFlip);
+	_Print(ADS1X15_SEVERITY_DEBUG, "%s result = 0x%04x, flipped = 0x%04x\n", ADS1X15_PRINT_BANNER, result, resultFlip);
 
 	// shift the flipped result
 	value 	= resultFlip >> conversionBitShift;
-	_Print("dbg:: shifted = 0x%04x, value = %d\n", value, value);
+	_Print(ADS1X15_SEVERITY_DEBUG, "%s shifted = 0x%04x, value = %d\n", ADS1X15_PRINT_BANNER, value, value);
 
 
 	return status;
@@ -147,7 +148,8 @@ int ads1X15::ReadAdc (int channel, int &value)
 							2
 						);
 	if (status != EXIT_SUCCESS) {
-		// ERROR!
+		_Print(ADS1X15_SEVERITY_FATAL, "ERROR: Reading Configuration Register failed!\n");
+		return status;
 	}
 
 	// set up the config register for single-ended read
@@ -196,7 +198,8 @@ int ads1X15::ReadAdc (int channel, int &value)
 							2
 						);
 	if (status != EXIT_SUCCESS) {
-		// ERROR!
+		_Print(ADS1X15_SEVERITY_FATAL, "ERROR: Writing to Configuration Register failed!\n");
+		return status;
 	}
 
 	// wait for the conversion to complete
@@ -205,9 +208,6 @@ int ads1X15::ReadAdc (int channel, int &value)
 
 	// read the conversion results
 	status = _ReadConverson(value);
-	if (status != EXIT_SUCCESS) {
-		// ERROR!
-	}
 
 
 	return status;
@@ -219,10 +219,6 @@ int ads1X15::ReadLastConversion (int &value)
 
 	// read the conversion results
 	status = _ReadConverson(value);
-	if (status != EXIT_SUCCESS) {
-		// ERROR!
-	}
-
 
 	return status;
 }

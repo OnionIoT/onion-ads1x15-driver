@@ -127,8 +127,9 @@ int main(int argc, char* argv[])
 
 	// run the ADC conversion
 	status 	= adsObj->ReadAdc(channel, value);
-
-	printf("> ADS channel%d, value is %d\n", channel, value);
+	if (status == EXIT_SUCCESS) {
+		printf("> ADS channel%d, value is %d\n", channel, value);
+	}
 
 
 	return 0;
