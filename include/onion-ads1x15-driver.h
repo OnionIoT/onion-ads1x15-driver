@@ -84,6 +84,16 @@ typedef enum
 	ADS1X15_NUM_CHANNELS
 } adsChannels_t;
 
+typedef enum
+{
+	ADS1X15_MAX_VOLTAGE_6_144V	= 6144,
+	ADS1X15_MAX_VOLTAGE_4_096V	= 4096,
+	ADS1X15_MAX_VOLTAGE_2_048V	= 2048,
+	ADS1X15_MAX_VOLTAGE_1_024V	= 1024,
+	ADS1X15_MAX_VOLTAGE_0_512V	= 512,
+	ADS1X15_MAX_VOLTAGE_0_256V	= 256
+} adsVoltageRanges_t;
+
 
 // enums to represent register settings
 typedef enum
@@ -163,7 +173,8 @@ public:
 
 	void 	SetVerbosity 	(int input);
 
-	int 	SetChannel		(int channel);
+	int 	ReadMaxVoltage 			(float maxVoltage);
+	int 	SetChannel				(int channel);
 /*
 	int 	SetInputMux 			(int muxSelect);
 	int 	SetMode 				(int mode);

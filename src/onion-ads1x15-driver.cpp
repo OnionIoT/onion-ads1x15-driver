@@ -149,17 +149,48 @@ int ads1X15::_ReadConverson (int &value)
 	value 	= resultFlip >> conversionBitShift;
 	_Print(ADS1X15_SEVERITY_DEBUG, "%s shifted = 0x%04x, value = %d\n", ADS1X15_PRINT_BANNER, value, value);
 
+	// keep sign bit intact if shifting
+	// REQUIRES DBG OF SIGNED/UNSIGNED
+	/*if (conversionBitShift > 0) {
+		if (value > 0x07ff) {
+			value |= 0xf000;
+			_Print(ADS1X15_SEVERITY_DEBUG, "%s sign-extend = 0x%04x, value = %d\n", ADS1X15_PRINT_BANNER, value, (unsigned int)value);
+		}
+	}*/
 
 	return status;
 }
 
 
-// class functions
+//// class functions
 int ads1X15::SetGain (int gain)
 {
 	gainValue	= gain;
 
 	return EXIT_SUCCESS;
+}
+
+// convert max input voltage into gain setting
+int ads1X15::ReadMaxVoltage (float maxVoltage) 
+{
+	int 	index	= -1;
+
+	// define the voltage levels
+	float 	voltages[ADS1X15_NUM_GAIN]	= {
+		(float)ADS1X15_MAX_VOLTAGE_6_144V / 1000.0f,
+		(float)ADS1X15_MAX_VOLTAGE_4_096V / 1000.0f,
+		(float)ADS1X15_MAX_VOLTAGE_2_048V / 1000.0f,
+		(float)ADS1X15_MAX_VOLTAGE_1_024V / 1000.0f,
+		(float)ADS1X15_MAX_VOLTAGE_0_512V / 1000.0f,
+		(float)ADS1X15_MAX_VOLTAGE_0_256V / 1000.0f
+	};
+
+	// find the 
+	while (maxVoltage < voltages[index+1]) {
+		index++;
+	}
+
+	return index;
 }
 
 int ads1X15::ReadAdc (int channel, int &value)

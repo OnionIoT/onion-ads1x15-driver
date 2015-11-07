@@ -2,10 +2,13 @@
 
 void usage(const char* progName) {
 	printf("Usage:\n");
-	printf("\t%s [-qvd] <channel> [gain]\n", progName);
+	printf("\t%s [-qvd] <channel> [max voltage]\n", progName);
 	printf("\n");
-	printf("<channel>	Analog input channel, can be 0 to 3\n");
-	printf("[gain]		Set gain parameter (optional)\n");	// expand on this
+	printf("<channel>\tAnalog input channel, can be 0 to 3\n");
+	printf("[max voltage]\tOptional: Set maximum expected input voltage\n");
+	printf("\tmax:	 6.144 V\n");
+	printf("\tmin: 	 0.256 V\n");
+	printf("\tdefault: 6.144 V\n");
 	printf("\n");
 	printf("Options\n");
 	printf("\t-q	Quiet: no output\n");
@@ -100,11 +103,12 @@ int main(int argc, char* argv[])
 
 	// gain argument
 	if (argc > 1) {
-		gain 		= atoi(argv[1]);
+		gain 		= adsObj->ReadMaxVoltage( atof(argv[1]) );
+		printf ("> Max input voltage %0.3f V corresponds to gain setting of %d\n", atof(argv[1]), gain);
 
 		if (gain < 0 || gain > ADS1X15_NUM_GAIN) {
 			usage(progname);
-			printf ("ERROR: invalid gain setting!\n");
+			printf ("ERROR: invalid max input voltage!\n");
 			return EXIT_FAILURE;
 		}
 	}
@@ -115,9 +119,9 @@ int main(int argc, char* argv[])
 	adsObj->SetVerbosity(verbose);
 	adsObj->SetDebugMode(debug);
 
-	// set the gain
+	// set the gain if specified
+	//	otherwise, default will be used
 	if (gain != -1) {
-		printf("> Setting gain to setting %d\n", gain);
 		status 	= adsObj->SetGain(gain);
 		if (status != EXIT_SUCCESS) {
 			printf("ERROR setting gain!\n");
