@@ -243,8 +243,15 @@ int ads1X15::ReadAdc (int channel, int &value)
 						);
 	if (status != EXIT_SUCCESS) {
 		_Print(ADS1X15_SEVERITY_FATAL, " ERROR: Writing to Configuration Register failed!\n");
-		return status;
+		//return status;
 	}
+
+	// dbg -- 
+	status = _ReadReg	(	ADS1X15_REG_ADDR_CONFIG, 
+							configReg.val, 
+							2
+						);
+	_Print(ADS1X15_SEVERITY_FATAL, " INFO: readback of config register: status = %d, value = 0x%04x \n", status, configReg.val);
 
 	// wait for the conversion to complete
 	usleep(conversionDelayUs);
