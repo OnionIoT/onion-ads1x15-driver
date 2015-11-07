@@ -74,7 +74,7 @@ int ads1X15::_ReadReg (int addr, int &value, int numBytes)
 
 int ads1X15::_WriteReg (int addr, int value, int numBytes)
 {
-	int status;
+	int status 		= EXIT_SUCCESS;
 
 	_Print(ADS1X15_SEVERITY_DEBUG, "%s Writing Reg addr 0x%02x with 0x%04x\n", ADS1X15_PRINT_BANNER, addr, value);
 
@@ -86,6 +86,8 @@ int ads1X15::_WriteReg (int addr, int value, int numBytes)
 							value, 
 							numBytes
 						);
+
+
 	}
 	else {
 		status 	= EXIT_SUCCESS;
@@ -143,11 +145,11 @@ int ads1X15::_ReadConverson (int &value)
 	// the bytes in the result are flipped
 	resultFlip 	= 0;
 	resultFlip 	= ( ((result & 0xff) << 8) | ((result >> 8) & 0xff) );
-	_Print(ADS1X15_SEVERITY_DEBUG, "%s result = 0x%04x, flipped = 0x%04x\n", ADS1X15_PRINT_BANNER, result, resultFlip);
+	_Print(ADS1X15_SEVERITY_DEBUG_EXTRA, "%s result = 0x%04x, flipped = 0x%04x\n", ADS1X15_PRINT_BANNER, result, resultFlip);
 
 	// shift the flipped result
 	value 	= resultFlip >> conversionBitShift;
-	_Print(ADS1X15_SEVERITY_DEBUG, "%s shifted = 0x%04x, value = %d\n", ADS1X15_PRINT_BANNER, value, value);
+	_Print(ADS1X15_SEVERITY_DEBUG_EXTRA, "%s shifted = 0x%04x, value = %d\n", ADS1X15_PRINT_BANNER, value, value);
 
 	// keep sign bit intact if shifting
 	// REQUIRES DBG OF SIGNED/UNSIGNED
@@ -245,13 +247,6 @@ int ads1X15::ReadAdc (int channel, int &value)
 		_Print(ADS1X15_SEVERITY_FATAL, " ERROR: Writing to Configuration Register failed!\n");
 		//return status;
 	}
-
-	// dbg -- 
-	status = _ReadReg	(	ADS1X15_REG_ADDR_CONFIG, 
-							configReg.val, 
-							2
-						);
-	_Print(ADS1X15_SEVERITY_FATAL, " INFO: readback of config register: status = %d, value = 0x%04x \n", status, configReg.val);
 
 	// wait for the conversion to complete
 	usleep(conversionDelayUs);
