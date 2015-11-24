@@ -1,4 +1,3 @@
-#include <onion-i2c.h>
 #include <onion-ads1x15-driver.h>
 
 ads1X15::ads1X15 (int addr, int type )
@@ -41,13 +40,13 @@ void ads1X15::SetVerbosity (int input)
 {
 	Module::SetVerbosity(input);
 
-	// also set the i2c lib verbosity
-	i2c_setVerbosity(input > 1 ? 1 : 0);
+	// also set the debug lib verbosity
+	onionSetVerbosity(input > 1 ? ONION_VERBOSITY_VERBOSE : ONION_VERBOSITY_NORMAL);
 }
 
 
 // private class function
-int ads1X15::_ReadReg (int addr, int &value, int numBytes)
+int ads1X15::_ReadReg (int addr, uint8_t *buffer, int numBytes)
 {
 	int status;
 
@@ -58,16 +57,17 @@ int ads1X15::_ReadReg (int addr, int &value, int numBytes)
 							ADS1X15_I2C_DEVICE_NUM, 
 							devAddr, 
 							addr, 
-							&value, 
+							buffer, 
 							numBytes
 						);
 	}
 	else {
-		status 	= EXIT_SUCCESS;;
-		value 	= 0x90e1;
+		status 		= EXIT_SUCCESS;;
+		buffer[0] 	= 0xe1;
+		buffer[1] 	= 0x90;
 	}
 
-	_Print(ADS1X15_SEVERITY_DEBUG, "\tRead value 0x%04x\n", value);
+	_Print(ADS1X15_SEVERITY_DEBUG, "\tRead value 0x%04x\n", (buffer[1] << 8 & buffer[0]) );
 
 	return status;
 }
@@ -130,11 +130,12 @@ int ads1X15::_ChannelToInputMux (int channel, int &inputMuxSel)
 int ads1X15::_ReadConverson (int &value)
 {
 	int 	status;
-	int 	result, resultFlip;
+	int 	result;
+	uint8_t	*buffer = new uint8_t[I2C_BUFFER_SIZE];
 
 	// read the conversion results
 	status = _ReadReg	(	ADS1X15_REG_ADDR_CONVERT, 
-							result, 
+							buffer, 
 							2
 						);
 	if (status != EXIT_SUCCESS) {
@@ -142,13 +143,13 @@ int ads1X15::_ReadConverson (int &value)
 		return status;
 	}
 
-	// the bytes in the result are flipped
-	resultFlip 	= 0;
-	resultFlip 	= ( ((result & 0xff) << 8) | ((result >> 8) & 0xff) );
-	_Print(ADS1X15_SEVERITY_DEBUG_EXTRA, "%s result = 0x%04x, flipped = 0x%04x\n", ADS1X15_PRINT_BANNER, result, resultFlip);
+	// reconstruct the value from the buffer
+	result 	= 0;
+	result 	= ( ((buffer[0] & 0xff) << 8) | (buffer[1] & 0xff) );
+	_Print(ADS1X15_SEVERITY_DEBUG_EXTRA, "%s result = 0x%04x\n", ADS1X15_PRINT_BANNER, result);
 
 	// shift the flipped result
-	value 	= resultFlip >> conversionBitShift;
+	value 	= result >> conversionBitShift;
 	_Print(ADS1X15_SEVERITY_DEBUG_EXTRA, "%s shifted = 0x%04x, value = %d\n", ADS1X15_PRINT_BANNER, value, value);
 
 	// keep sign bit intact if shifting
@@ -197,9 +198,9 @@ int ads1X15::ReadMaxVoltage (float maxVoltage)
 
 int ads1X15::ReadAdc (int channel, int &value)
 {
-	int 	status;
+	int 			status, channelVal;
 	adsRegConfig_t 	configReg;
-	int 	result, resultFlip, channelVal;
+	uint8_t			*buffer = new uint8_t[I2C_BUFFER_SIZE];
 
 
 	if (channel >= ADS1X15_NUM_CHANNELS) {
@@ -208,13 +209,16 @@ int ads1X15::ReadAdc (int channel, int &value)
 
 	// read the current reg value
 	status = _ReadReg	(	ADS1X15_REG_ADDR_CONFIG, 
-							configReg.val, 
+							buffer, 
 							2
 						);
 	if (status != EXIT_SUCCESS) {
 		_Print(ADS1X15_SEVERITY_FATAL, " ERROR: Reading Configuration Register failed!\n");
 		return status;
 	}
+
+	// reconstruct the register value
+	configReg.val 					= ((buffer[1] & 0xff) << 8) & (buffer[0] & 0xff);
 
 	// set up the config register for single-ended read
 	configReg.f.comp_queue 			= ADS1X15_COMP_QUEUE_DISABLE_COMP;		// disable comparator

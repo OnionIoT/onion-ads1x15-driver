@@ -20,7 +20,7 @@ OBJECTS := $(patsubst $(SRCDIR)/%,$(BUILDDIR)/%,$(SOURCES:.$(SRCEXT)=.o))
 CXXFLAGS := -g # -Wall
 
 INC := $(shell find $(INCDIR) -maxdepth 1 -type d -exec echo -I {}  \;)
-LIB += -lonioni2c
+LIB += -loniondebug -lonioni2c
 
 ifeq ($(UNAME_S),Darwin)
 	# only add this when compiling on OS X

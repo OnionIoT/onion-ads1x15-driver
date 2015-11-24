@@ -3,6 +3,9 @@
 
 #include <module.h>
 #include <unistd.h>
+
+//#include <onion-debug.h>
+#include <onion-i2c.h>
 		
 
 #define ADS1X15_PRINT_BANNER			"ADS1X15::"
@@ -194,7 +197,7 @@ public:
 
 private:
 	// private functions
-	int 	_ReadReg 				(int addr, int &value, int numBytes);
+	int 	_ReadReg 				(int addr, uint8_t *buffer, int numBytes);
 	int 	_WriteReg 				(int addr, int value, int numBytes);
 
 	int 	_ChannelToInputMux		(int channel, int &fieldValue);
