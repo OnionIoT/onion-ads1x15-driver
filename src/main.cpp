@@ -54,7 +54,6 @@ int main(int argc, char* argv[])
 	verbose 	= ADS1X15_MAIN_DEFAULT_VERBOSITY;
 	debug 		= ADS1X15_MAIN_DEFAULT_DEBUG;
 
-
 	//// parse the option arguments
 	while ((ch = getopt(argc, argv, "xvqdh")) != -1) {
 		switch (ch) {
@@ -111,7 +110,9 @@ int main(int argc, char* argv[])
 			printf ("ERROR: invalid max input voltage!\n");
 			return EXIT_FAILURE;
 		}
-	}
+	} else {
+            gain = 0;
+        }
 
 
 	//// actual program

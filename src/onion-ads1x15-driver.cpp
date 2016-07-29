@@ -242,7 +242,8 @@ int ads1X15::ReadAdc (int channel, int &value)
 	configReg.f.status_start 		= 1;
 
 
-	// write to the config register
+	// write to the config register after required swap of byte order
+        configReg.val = ((configReg.val & 0xff) << 8) | ((configReg.val & 0xff00) >> 8);
 	status = _WriteReg	( 	ADS1X15_REG_ADDR_CONFIG,
 							configReg.val,
 							2
